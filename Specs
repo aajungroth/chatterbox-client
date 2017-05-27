@@ -1,7 +1,13 @@
 Display messages
  div tag
+ define window.displayMessage function on global scope
+   window.displayMessage = function (message) {
+
+   }
+   
 Refresh Displayed Messages
- button tag
+ --automatic 
+
 Users Select Username
 
 Users send messages with their username
@@ -14,3 +20,4 @@ Click on username & add friend
   a
 Display messages from friends in bold
 
+New message class = text

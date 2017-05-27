@@ -16,7 +16,7 @@ app.server='http://parse.hrr.hackreactor.com/chatterbox/classes/messages';
 //username = href
 //text -- input to string?
 //roomname.append to message
-$('.send').on('click', function(){
+$('.send').on('click', function() {
 
 });
 var testMessage = {
@@ -25,7 +25,7 @@ var testMessage = {
   roomname: 'test'
 };
 
-app.send = function(message){
+app.send = function(message) {
   /*
   $.post("http://parse.hrr.hackreactor.com/chatterbox.classes/messages",
     message

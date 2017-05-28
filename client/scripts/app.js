@@ -21,7 +21,9 @@ var app = $(document).ready(function() {
   app.$roomCount = 0;
   app.$rooms = {};
 
-  app.$chats.on('click', app.$username, app.handleUsernameClick);
+  app.$chats.on('click', app.$username, function(event) {
+    app.handleUsernameClick(event);
+  });
 
   app.$send.submit(function(event) {
     app.handleSubmit();
@@ -162,11 +164,12 @@ app.handleNewRoom = function(roomname) {
 app.handleUsernameClick = function(event) {
   //when username clicked adds username to friends list
   var username = $(event.target).data('username');
-  console.log(username);
+
   if (username !== undefined) {
     app.friends[username] = !app.friends[username];
 
     var selector = '[data-username="' + username.replace(/"/g, '\\\"' + '"]');
     var $usernames = $(selector).toggleClass('friend');
   }
+  event.preventDefault();
 };

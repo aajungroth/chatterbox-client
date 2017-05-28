@@ -5,6 +5,7 @@ describe('chatterbox', function() {
 
   describe('init', function() {
     it('should have a method called init', function() {
+      expect(app.init).to.be.ok;
       expect(app.init).to.be.a('function');
     });
 
@@ -107,6 +108,8 @@ describe('chatterbox', function() {
         app.init();
 
         $('#main').find('.username').trigger('click');
+        console.log($('#main').find('.username').text());
+        console.log($('#chats').find('.username').text());
         expect(app.handleUsernameClick.called).to.be.true;
 
         app.handleUsernameClick.restore();

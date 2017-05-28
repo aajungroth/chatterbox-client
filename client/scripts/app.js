@@ -1,38 +1,43 @@
+
 var app = $(document).ready(function() {
   app.username = window.location.search.substr(10) || 'anonymous';
   app.server = 'http://parse.hrr.hackreactor.com/chatterbox/classes/messages';
   app.roomname = 'lobby';
   app.messages = [];
+  app.friends = {};
   app.lastMessageId = 0;
   // Cache jQuery selectors
   app.$message = $('#message');
   app.$chats = $('#chats');
   app.$roomSelect = $('#roomSelect');
-  app.$send = $('#send .submit');
+  app.$send = $('#send');
   app.$username = $('.username');
   app.$createRoom = $('#createRoom');
   app.$newRoom = $('.newRoom');
   app.$roomName = $('.roomName');
+  app.$roomChoices = $('.dropdown').find('#roomSelect').children();
   //var $text = $('.text').find(input).val();
   //var $text = 'test message'
+  app.$roomCount = 0;
   app.$rooms = {};
-  app.$friends = {};
 
-  $('#main').on('click', app.$username, function() {
-    app.handleUsernameClick($(this).text());
+  app.$chats.on('click', app.$username, app.handleUsernameClick);
+
+  app.$send.submit(function(event) {
+    app.handleSubmit();
+    event.preventDefault();
   });
 
-  //roomname.append to message
-  $('#main').on('submit', app.$send, app.handleSubmit);
-  //app.$send.on('submit', function(event) {
-  //  app.handleSubmit(event);
-  //});
-
-  $('nav').on('submit', app.$createRoom, function(event) {
-    app.handleNewRoom(event, app.$newRoom.val());
+  $('#createRoom').submit(function(event) {
+    app.handleNewRoom(app.$newRoom.val());
+    event.preventDefault();
   });
 
-  $('nav').on('click', app.$roomName, app.handleRoomChange);
+  $('.dropdown-menu').on('click', app.$roomName, function(event) {
+    event.preventDefault();
+    app.handleRoomChange($(event.target).text());
+  });//
+
 
   // setInterval(function() {
   //   app.fetch();
@@ -40,14 +45,7 @@ var app = $(document).ready(function() {
 
 });
 
-var testMessage = {
-  username: 'test',
-  text: 'ipsum lorem',
-  roomname: 'test'
-};
-
 app.send = function(message) {
-
   $.ajax({
     url: 'http://parse.hrr.hackreactor.com/chatterbox/classes/messages',
     type: 'POST',
@@ -78,6 +76,7 @@ app.fetch = function(message) {
       var mostRecentMessage = app.messages[app.messages.length - 1];
 
       if (mostRecentMessage.objectID !== app.lastMessageId) {
+        app.renderRoomList(app.messages);
         app.renderMessages(app.messages);
         console.log('chatterbox: Message received');
       }
@@ -97,61 +96,77 @@ app.renderMessages = function(messages) {
 
   app.clearMessages();
 
-  messages.forEach(app.renderMessage);
+  messages
+    .filter(function(message) {
+      if (app.roomname === 'lobby' && !message.roomname) {
+        return true;
+      } else if (message.roomname === app.roomname) {
+        return true;
+      }
+    })
+    .forEach(app.renderMessage);
 };
 
 app.renderMessage = function(message) {
   var $chat = $('<div class="chat"/>');
-
-  var $username = $('<span class="username">' + message.username + '</span>');
+  var $username = $('<span class="username"></span>').text(message.username);
+  $username.attr('data-username', message.username);
   $username.appendTo($chat);
 
-  var $message = $('<br><span>' + message.text + '</span>');
+  var $message = $('<br><span></span>').text(message.text);
   $message.appendTo($chat);
-
   app.$chats.append($chat);
 };
 
-app.handleSubmit = function (event) {
+app.renderRoomList = function(messages) {
+  if (messages) {
+    messages.forEach(function(message) {
+      var roomname = message.roomname;
+      if (roomname && !app.$rooms[roomname]) {
+        app.renderRoom(roomname);
+        app.$rooms[roomname] = true;
+      }
+    });
+  }
+};
+
+app.handleSubmit = function() {
   var message = {
     username: app.username,
-    text: app.$message.val(),
+    text: app.$message.text(),
     roomname: app.roomname || 'lobby'
   };
-
   app.send(message);
-  event.preventDefault();
 };
 
 app.renderRoom = function(roomname) {
-  //<li><a href="#">One more separated link</a></li>
   if (!app.$rooms.hasOwnProperty(roomname)) {
-    var $option = $('<li class="roomName"><a href="#"></a></li>').val(roomname).text(roomname);
+    var $option = $('<li class="roomName"><a href="#"></a></li>').text(roomname);
     app.$roomSelect.append($option);
     app.$rooms[roomname] = true;
   }
   app.$newRoom.val('');
 };
 
-app.handleRoomChange = function(event) {
-  var selectIndex = app.$roomSelect.prop('selectedIndex');
-  console.log(selectIndex);
-  if (selectIndex === 0) {
-    var roomname = prompt('Enter room name');
-    if (roomname) {
-      app.roomname = roomname;
-      app.renderRoom(roomname);
-      app.$roomSelect(roomname);
-    }
-  }
+app.handleRoomChange = function(roomname) {
+  //set text equal to var roomname
+  app.roomname = roomname;
+  app.renderRoom(roomname);
+  app.renderMessages(app.messages);
 };
 
-app.handleNewRoom = function(event, roomname) {
-  event.preventDefault();
+app.handleNewRoom = function(roomname) {
   app.renderRoom(roomname);
 };
 
-app.handleUsernameClick = function(username) {
+app.handleUsernameClick = function(event) {
   //when username clicked adds username to friends list
-  this.$friends[username] = true;
+  var username = $(event.target).data('username');
+  console.log(username);
+  if (username !== undefined) {
+    app.friends[username] = !app.friends[username];
+
+    var selector = '[data-username="' + username.replace(/"/g, '\\\"' + '"]');
+    var $usernames = $(selector).toggleClass('friend');
+  }
 };

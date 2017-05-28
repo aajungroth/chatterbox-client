@@ -4,9 +4,9 @@ Display messages
    window.displayMessage = function (message) {
 
    }
-   
+
 Refresh Displayed Messages
- --automatic 
+ --automatic
 
 Users Select Username
 
@@ -20,4 +20,4 @@ Click on username & add friend
   a
 Display messages from friends in bold
 
-New message class = text
+New message class = text + append class of roomname

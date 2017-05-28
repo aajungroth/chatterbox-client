@@ -5,7 +5,7 @@ describe('chatterbox', function() {
 
   describe('init', function() {
     it('should have a method called init', function() {
-      expect(app.init).to.be.ok;
+      expect(app.init).to.be.a('function');
     });
 
   });

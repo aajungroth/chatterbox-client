@@ -41,9 +41,9 @@ var app = $(document).ready(function() {
   });//
 
 
-  // setInterval(function() {
-  //   app.fetch();
-  // }, 3000);
+  setInterval(function() {
+    app.fetch();
+  }, 3000);
 
 });
 
@@ -69,6 +69,7 @@ app.fetch = function(message) {
   $.ajax({
     url: 'http://parse.hrr.hackreactor.com/chatterbox/classes/messages',
     type: 'GET',
+    data: {order: '-createdAt'},
     success: function (data) {
       if (!data.results || !data.results.length) { return; }
 
@@ -135,7 +136,7 @@ app.renderRoomList = function(messages) {
 app.handleSubmit = function() {
   var message = {
     username: app.username,
-    text: app.$message.text(),
+    text: app.$message.val(),
     roomname: app.roomname || 'lobby'
   };
   app.send(message);

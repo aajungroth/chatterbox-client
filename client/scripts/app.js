@@ -145,6 +145,7 @@ app.handleSubmit = function() {
 };
 
 app.renderRoom = function(roomname) {
+  roomname = roomname.slice(0, 10);
   if (!app.$rooms.hasOwnProperty(roomname)) {
     var $option = $('<li class="roomName"><a href="#"></a></li>').text(roomname);
     app.$roomSelect.append($option);

@@ -40,6 +40,7 @@ var app = $(document).ready(function() {
     app.handleRoomChange($(event.target).text());
   });//
 
+  app.fetch();
 
   setInterval(function() {
     app.fetch();
@@ -108,11 +109,13 @@ app.renderMessages = function(messages) {
       }
     })
     .forEach(app.renderMessage);
+  app.markFriends();
 };
 
 app.renderMessage = function(message) {
   var $chat = $('<div class="chat"/>');
   var $username = $('<span class="username"></span>').text(message.username);
+
   $username.attr('data-username', message.username);
   $username.appendTo($chat);
 
@@ -127,7 +130,6 @@ app.renderRoomList = function(messages) {
       var roomname = message.roomname;
       if (roomname && !app.$rooms[roomname]) {
         app.renderRoom(roomname);
-        app.$rooms[roomname] = true;
       }
     });
   }
@@ -173,4 +175,18 @@ app.handleUsernameClick = function(event) {
     var $usernames = $(selector).toggleClass('friend');
   }
   event.preventDefault();
+};
+
+app.markFriends = function() {
+  var users = $('#chats').children();
+  var user;
+  var username;
+
+  for (var i = 0; i < users.length; i++) {
+    user = $(users[i]).find('.username');
+    username = $(user).data('username');
+    if ((app.friends.hasOwnProperty(username)) && (app.friends[username] === true) && ($(user).hasClass('friend') === false)) {
+      $(user).toggleClass('friend');
+    }
+  }
 };
